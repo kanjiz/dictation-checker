@@ -1,0 +1,36 @@
+# 依存関係・ビルド成果物
+node_modules/
+dist/
+.vite/
+
+# 環境変数
+.env
+.env.*
+!.env.example
+
+# ログファイル
+*.log
+npm-debug.log*
+
+# テストカバレッジ
+coverage/
+.nyc_output/
+
+# IDE設定（個人設定のみ除外）
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ツール設定（ローカル設定のみ除外）
+.serena/
+.claude/
+*.local
+
+# OS固有ファイル
+.DS_Store
+Thumbs.db
+
+# TypeScript
+*.tsbuildinfo
