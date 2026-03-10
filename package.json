@@ -16,7 +16,10 @@
     "lint:md": "markdownlint-cli2 \"**/*.md\""
   },
   "devDependencies": {
+    "@vitest/browser": "^4.0.18",
+    "@vitest/browser-playwright": "^4.0.18",
     "markdownlint-cli2": "^0.21.0",
+    "playwright": "^1.58.2",
     "typescript": "~5.9.3",
     "vite": "^7.3.1",
     "vitest": "^4.0.18"
