@@ -1,5 +1,8 @@
 name: CI
 
+# PR と main への push でテストを自動実行する。
+# マージ前に回帰を検出することが目的。
+
 on:
   push:
     branches: [main]
@@ -10,20 +13,21 @@ jobs:
   test:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: read  # チェックアウトのみ。書き込み権限は不要。
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
         with:
           node-version: '24'
-          cache: 'npm'
+          cache: 'npm'  # node_modules を npm ci のたびに再インストールしないためのキャッシュ
       - run: npm ci
       - name: Cache Playwright browsers
         uses: actions/cache@v5
         id: playwright-cache
         with:
           path: ~/.cache/ms-playwright
+          # package-lock.json が変わったとき（= Playwright バージョンが変わったとき）だけキャッシュを更新する
           key: playwright-chromium-${{ hashFiles('package-lock.json') }}
       - run: npx playwright install chromium --with-deps
-        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        if: steps.playwright-cache.outputs.cache-hit != 'true'  # キャッシュヒット時はスキップ
       - run: npm test

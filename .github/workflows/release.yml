@@ -1,5 +1,8 @@
 name: Release
 
+# v* タグ（例: v1.0.0）を push したときに自動でリリースを作成する。
+# テストが失敗した場合はリリースを中断する。
+
 on:
   push:
     tags: ['v*']
@@ -8,20 +11,22 @@ jobs:
   release:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: write  # GitHub Release の作成とアセットのアップロードに必要
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
         with:
           node-version: '24'
-          cache: 'npm'
+          cache: 'npm'  # node_modules を npm ci のたびに再インストールしないためのキャッシュ
       - run: npm ci
       - run: npx playwright install chromium --with-deps
-      - run: npm test
+      - run: npm test  # テスト失敗時はここで中断されリリースされない
       - run: npm run build
       - name: ZIP the dist
         run: |
           cd dist
+          # dist/ の中身をすべて ZIP 化する。
+          # 解凍後に index.html をダブルクリックするだけで起動できる構成にする。
           zip -r ../dictation-checker-${{ github.ref_name }}.zip .
       - uses: softprops/action-gh-release@v2
         with:
