@@ -1,0 +1,20 @@
+{
+  // markdownlint-cli2 設定
+  "config": {
+    // デフォルトですべてのルールを有効化
+    "default": true,
+    // 行の長さ制限を無効化（日本語は文字数カウントが難しいため）
+    "MD013": false,
+    // 同一レベルでの重複見出しを許可
+    "MD024": false,
+    // インライン HTML を許可（テーブルなどで必要な場合がある）
+    "MD033": false
+  },
+  // node_modules などを除外
+  "ignores": [
+    "node_modules",
+    "dist",
+    ".vite",
+    ".serena"
+  ]
+}
