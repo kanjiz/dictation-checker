@@ -54,4 +54,52 @@ describe('handleKeydown', () => {
       expect(announce).toHaveBeenCalledWith('停止');
     });
   });
+
+  describe('Ctrl+ArrowLeft — 10秒戻る', () => {
+    it('currentTime を 10 秒戻す', () => {
+      const ct = mockCurrentTime(player, 30);
+      fire('ArrowLeft', true);
+      expect(ct.get()).toBe(20);
+      expect(announce).toHaveBeenCalledWith('10秒戻る');
+    });
+
+    it('currentTime が 5 秒のとき 0 にクランプする', () => {
+      const ct = mockCurrentTime(player, 5);
+      fire('ArrowLeft', true);
+      expect(ct.get()).toBe(0);
+    });
+  });
+
+  describe('Ctrl+ArrowRight — 10秒進む', () => {
+    beforeEach(() => {
+      Object.defineProperty(player, 'duration', { value: 50, configurable: true });
+    });
+
+    it('currentTime を 10 秒進める', () => {
+      const ct = mockCurrentTime(player, 30);
+      fire('ArrowRight', true);
+      expect(ct.get()).toBe(40);
+      expect(announce).toHaveBeenCalledWith('10秒進む');
+    });
+
+    it('currentTime が duration に近いとき duration にクランプする', () => {
+      const ct = mockCurrentTime(player, 45);
+      fire('ArrowRight', true);
+      expect(ct.get()).toBe(50);
+    });
+  });
+
+  describe('無視するケース', () => {
+    it('Ctrl なしの Enter は何もしない', () => {
+      fire('Enter', false);
+      expect(player.play).not.toHaveBeenCalled();
+      expect(announce).not.toHaveBeenCalled();
+    });
+
+    it('Ctrl+A は何もしない', () => {
+      fire('A', true);
+      expect(player.play).not.toHaveBeenCalled();
+      expect(announce).not.toHaveBeenCalled();
+    });
+  });
 });

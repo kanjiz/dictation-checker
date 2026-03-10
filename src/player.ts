@@ -28,5 +28,13 @@ export function handleKeydown(
       player.pause();
       announce('停止');
     }
+  } else if (matches(event, config.seekBack)) {
+    event.preventDefault();
+    player.currentTime = Math.max(0, player.currentTime - 10);
+    announce('10秒戻る');
+  } else if (matches(event, config.seekForward)) {
+    event.preventDefault();
+    player.currentTime = Math.min(player.duration, player.currentTime + 10);
+    announce('10秒進む');
   }
 }
