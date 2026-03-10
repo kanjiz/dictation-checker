@@ -91,7 +91,8 @@ jobs:
         with:
           path: ~/.cache/ms-playwright
           key: playwright-chromium-${{ hashFiles('package-lock.json') }}
-      - run: npx playwright install chromium --with-deps
+      - name: Install Playwright browsers
+        run: npx playwright install chromium --with-deps
         if: steps.playwright-cache.outputs.cache-hit != 'true'
       - run: npm test
 ```
@@ -117,7 +118,15 @@ jobs:
           node-version: '24'
           cache: 'npm'
       - run: npm ci
-      - run: npx playwright install chromium --with-deps
+      - name: Cache Playwright browsers
+        uses: actions/cache@v5
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-chromium-${{ hashFiles('package-lock.json') }}
+      - name: Install Playwright browsers
+        run: npx playwright install chromium --with-deps
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
       - run: npm test
       - run: npm run build
       - name: ZIP the dist
