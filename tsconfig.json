@@ -1,0 +1,66 @@
+{
+  "compilerOptions": {
+    // --- 出力ターゲット ---
+    // ES2024 に固定。ESNext は TypeScript バージョンアップで挙動が変わるため避ける。
+    "target": "ES2024",
+    // クラスフィールドを ES2022 仕様（defineProperty）で出力する。
+    // ブラウザの挙動と一致させるために有効化。
+    "useDefineForClassFields": true,
+    // Vite（esbuild）は ESM を前提とするため ESNext を指定。
+    "module": "ESNext",
+    // ブラウザ環境で必要な型定義のみを含める。
+    // DOM.Iterable は NodeList 等のイテレーション型に必要。
+    "lib": ["ES2024", "DOM", "DOM.Iterable"],
+    // Vite 固有の型定義（import.meta.env 等）を有効化。
+    "types": ["vite/client"],
+
+    // --- モジュール解決 ---
+    // Vite / esbuild に対応したモジュール解決戦略。
+    // node16/nodenext より現代的なバンドラー向けの設定。
+    "moduleResolution": "bundler",
+    // .ts 拡張子付きインポートを許可（Vite 環境では標準的）。
+    "allowImportingTsExtensions": true,
+    // 各ファイルを独立したモジュールとして扱う。
+    // esbuild はファイル単位で変換するため、型のみファイルでも安全性を確保できる。
+    "isolatedModules": true,
+    // 曖昧なファイルをスクリプトではなくモジュールとして扱う。
+    "moduleDetection": "force",
+    // 型のみのインポートを import type で明示することを強制。
+    // esbuild による型消去の際に値として誤って扱われるのを防ぐ。
+    "verbatimModuleSyntax": true,
+    // esbuild/SWC が型消去のみで処理できない構文（enum, namespace 等）を禁止。
+    // ビルドツールとの互換性を保証する。
+    "erasableSyntaxOnly": true,
+
+    // --- 型チェック専用モード ---
+    // tsc は型チェックのみ実施し、JS ファイルは出力しない。
+    // 実際のビルドは Vite（esbuild）が担う。
+    "noEmit": true,
+    // ライブラリの型定義ファイルのエラーを無視する。
+    // 外部ライブラリの型定義の不整合で開発が止まるのを防ぐ。
+    "skipLibCheck": true,
+
+    // --- 厳格な型チェック ---
+    // strict: true は以下を一括で有効化する:
+    // strictNullChecks, strictFunctionTypes, strictBindCallApply,
+    // strictPropertyInitialization, noImplicitAny, noImplicitThis,
+    // useUnknownInCatchVariables, alwaysStrict
+    "strict": true,
+    // 使用されていないローカル変数をエラーとして検出する。
+    "noUnusedLocals": true,
+    // 使用されていない関数パラメータをエラーとして検出する。
+    "noUnusedParameters": true,
+    // switch 文で break を書き忘れた場合（フォールスルー）をエラーとする。
+    "noFallthroughCasesInSwitch": true,
+    // 配列・オブジェクトのインデックスアクセスの戻り値に | undefined を付加する。
+    // 例: files[0] の型が T ではなく T | undefined になり、未定義アクセスを検出できる。
+    "noUncheckedIndexedAccess": true,
+    // オプショナルプロパティ（foo?: string）への undefined の明示的なセットを禁止する。
+    // 「未定義」と「明示的な undefined」を区別することで型安全性を高める。
+    "exactOptionalPropertyTypes": true,
+    // ファイル名の大文字小文字を一貫して扱うことを強制する。
+    // macOS（大文字小文字を区別しない）と Linux（区別する）での動作差異を防ぐ。
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": ["src"]
+}
