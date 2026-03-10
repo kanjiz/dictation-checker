@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>書き取りツール</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/src/style.css">
+</head>
+<body>
+  <div id="app">
+    <header>
+      <h1>書き取りツール</h1>
+      <p>音声を聴きながらタイピング練習ができるツールです。</p>
+    </header>
+
+    <main>
+      <section class="setup-section" aria-labelledby="setup-title">
+        <h2 id="setup-title" class="visually-hidden">音声設定</h2>
+        <div class="field">
+          <label for="audioFile">音声ファイルを選択してください</label>
+          <input type="file" id="audioFile" accept="audio/*" aria-describedby="audio-help">
+          <p id="audio-help" class="visually-hidden">ファイルを選択すると、自動的にプレイヤーに読み込まれます。</p>
+        </div>
+      </section>
+
+      <section class="player-section" aria-label="再生コントロール">
+        <audio id="player" controls aria-label="音声再生"></audio>
+        <div id="status-region" class="visually-hidden" aria-live="polite"></div>
+      </section>
+
+      <section class="editor-section" aria-labelledby="editor-title">
+        <h2 id="editor-title" class="visually-hidden">入力エリア</h2>
+        <label for="editor">書き取りテキストを入力してください</label>
+        <textarea
+          id="editor"
+          placeholder="Ctrl + Enter で再生・一時停止"
+          aria-multiline="true"
+          aria-keyshortcuts="Control+Enter Control+ArrowLeft"
+          spellcheck="false"
+        ></textarea>
+      </section>
+    </main>
+
+    <footer>
+      <section aria-labelledby="shortcut-title">
+        <h2 id="shortcut-title">操作案内（キーボードショートカット）</h2>
+        <ul>
+          <li><kbd>Ctrl</kbd> + <kbd>Enter</kbd>: 再生 / 一時停止</li>
+          <li><kbd>Ctrl</kbd> + <kbd>←</kbd>: 10秒戻る</li>
+          <li><kbd>Ctrl</kbd> + <kbd>→</kbd>: 10秒進む</li>
+        </ul>
+      </section>
+    </footer>
+  </div>
+
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>
