@@ -67,6 +67,7 @@ describe('handleKeydown', () => {
       const ct = mockCurrentTime(player, 5);
       fire('ArrowLeft', true);
       expect(ct.get()).toBe(0);
+      expect(announce).toHaveBeenCalledWith('10秒戻る');
     });
   });
 
@@ -86,6 +87,7 @@ describe('handleKeydown', () => {
       const ct = mockCurrentTime(player, 45);
       fire('ArrowRight', true);
       expect(ct.get()).toBe(50);
+      expect(announce).toHaveBeenCalledWith('10秒進む');
     });
   });
 
@@ -93,12 +95,14 @@ describe('handleKeydown', () => {
     it('Ctrl なしの Enter は何もしない', () => {
       fire('Enter', false);
       expect(player.play).not.toHaveBeenCalled();
+      expect(player.pause).not.toHaveBeenCalled();
       expect(announce).not.toHaveBeenCalled();
     });
 
     it('Ctrl+A は何もしない', () => {
       fire('A', true);
       expect(player.play).not.toHaveBeenCalled();
+      expect(player.pause).not.toHaveBeenCalled();
       expect(announce).not.toHaveBeenCalled();
     });
   });
