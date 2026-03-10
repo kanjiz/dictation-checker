@@ -1,0 +1,103 @@
+:root {
+  /* 標準サイズを 24px に設定（1rem = 24px となる） */
+  font-size: 24px;
+
+  --primary-color: #004a99;
+  --focus-outline: #ffbf47;
+  --bg-color: #ffffff;
+  --text-color: #1a1a1a;
+  --border-color: #767676;
+
+  /* フォントを BIZ UDPGothic に変更 */
+  --font-family: 'BIZ UDPGothic', system-ui, -apple-system, sans-serif;
+}
+
+body {
+  font-family: var(--font-family);
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  line-height: 1.6;
+  margin: 0;
+  padding: 1rem; /* 24px */
+  max-width: 50rem; /* 1200px (24px * 50) */
+  margin: 0 auto;
+}
+
+header {
+  border-bottom: 3px solid var(--border-color);
+  margin-bottom: 1.5rem; /* 36px */
+  padding-bottom: 0.5rem; /* 12px */
+}
+
+h1 {
+  font-size: 1.8rem; /* 43.2px */
+  margin: 0;
+}
+
+p {
+  font-size: 1rem; /* 24px */
+}
+
+/* アクセシビリティ設定 */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+:focus-visible {
+  outline: 6px solid var(--focus-outline) !important; /* 太くして視認性をアップ */
+  outline-offset: 3px;
+}
+
+/* フォームとプレイヤー */
+.field label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 0.5rem; /* 12px */
+}
+
+input[type="file"] {
+  font-size: 0.8rem; /* 19.2px 少し抑えめに */
+  margin-bottom: 1rem;
+}
+
+#player {
+  width: 100%;
+  height: 2.5rem; /* 60px プレイヤー自体も操作しやすく */
+  margin: 1.5rem 0;
+}
+
+/* エディタ */
+#editor {
+  width: 100%;
+  min-height: 15rem; /* 360px */
+  padding: 0.8rem; /* 19.2px */
+  font-family: var(--font-family); /* テキストエリアにも適用 */
+  font-size: 1.1rem; /* 26.4px 入力文字を標準より少し大きく */
+  border: 3px solid var(--border-color);
+  border-radius: 6px;
+  box-sizing: border-box;
+  resize: vertical;
+}
+
+/* フッター */
+footer {
+  margin-top: 2rem;
+  font-size: 0.85rem; /* 20.4px 十分に読めるサイズ */
+  color: #444;
+}
+
+kbd {
+  background-color: #f0f0f0;
+  border: 2px solid #ccc;
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-family: sans-serif; /* ショートカット記号は見慣れたフォントで */
+  font-weight: bold;
+}
