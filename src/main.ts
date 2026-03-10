@@ -4,6 +4,9 @@
  * スクリーンリーダー向けのアクセシビリティ通知を管理します。
  */
 
+import { handleKeydown } from './player.ts';
+import { DEFAULT_SHORTCUTS } from './shortcuts.ts';
+
 /** 音声再生用のHTMLAudioElement */
 const player = document.getElementById('player') as HTMLAudioElement;
 
@@ -59,37 +62,6 @@ audioInput.addEventListener('change', (e: Event) => {
   }
 });
 
-/**
- * キーボードショートカットの制御。
- * - Ctrl + Enter: 再生/一時停止
- * - Ctrl + ArrowLeft: 10秒戻る
- * - Ctrl + ArrowRight: 10秒進む
- */
 editor.addEventListener('keydown', (e: KeyboardEvent) => {
-  if (e.ctrlKey) {
-    switch (e.key) {
-      case 'Enter':
-        e.preventDefault();
-        if (player.paused) {
-          player.play();
-          announce("再生");
-        } else {
-          player.pause();
-          announce("停止");
-        }
-        break;
-
-      case 'ArrowLeft':
-        e.preventDefault();
-        player.currentTime = Math.max(0, player.currentTime - 10);
-        announce("10秒戻る");
-        break;
-
-      case 'ArrowRight':
-        e.preventDefault();
-        player.currentTime = Math.min(player.duration, player.currentTime + 10);
-        announce("10秒進む");
-        break;
-    }
-  }
+  handleKeydown(e, player, DEFAULT_SHORTCUTS, announce);
 });

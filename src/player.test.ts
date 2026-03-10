@@ -19,13 +19,13 @@ function mockCurrentTime(player: HTMLAudioElement, initial = 0): { get: () => nu
 
 describe('handleKeydown', () => {
   let player: HTMLAudioElement;
-  let announce: ReturnType<typeof vi.fn>;
+  let announce: ReturnType<typeof vi.fn<(message: string) => void>>;
 
   beforeEach(() => {
     player = document.createElement('audio');
     vi.spyOn(player, 'play').mockResolvedValue(undefined);
     vi.spyOn(player, 'pause').mockImplementation(() => { /* noop */ });
-    announce = vi.fn();
+    announce = vi.fn<(message: string) => void>();
   });
 
   const fire = (key: string, ctrl: boolean) => {
