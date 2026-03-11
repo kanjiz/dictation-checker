@@ -26,7 +26,8 @@ jobs:
         id: playwright-cache
         with:
           path: ~/.cache/ms-playwright
-          # package-lock.json が変わったとき（= Playwright バージョンが変わったとき）だけキャッシュを更新する
+          # Playwright バージョンが変わったとき（package-lock.json の変化で検出）だけキャッシュを更新する
+          # キー名に chromium-firefox を含めてブラウザ構成の変化を反映する
           key: playwright-chromium-firefox-${{ hashFiles('package-lock.json') }}
       - name: Install Playwright browsers
         run: npx playwright install chromium firefox --with-deps
