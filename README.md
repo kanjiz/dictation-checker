@@ -9,7 +9,7 @@
 2. ZIP を展開
 3. `index.html` をダブルクリックして開く
 
-> Google Chrome 推奨（Chromium ベースのブラウザで動作）
+> Google Chrome 推奨（Chromium ベースのブラウザおよび Firefox で動作）
 
 ## 使い方
 
@@ -34,7 +34,7 @@
 
 ```bash
 npm install
-npx playwright install chromium  # テスト用ブラウザをインストール
+npx playwright install chromium firefox  # テスト用ブラウザをインストール
 npm run dev      # 開発サーバー起動
 npm test         # テスト実行
 npm run build    # ビルド（dist/ に出力）
