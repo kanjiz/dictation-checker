@@ -10,8 +10,8 @@ export default defineConfig({
       enabled: true,
       // Playwright をブラウザ操作エンジンとして使用する
       provider: playwright(),
-      // CI と同じ Chromium 1 インスタンスで実行（クロスブラウザは不要）
-      instances: [{ browser: 'chromium' }],
+      // Chromium と Firefox の両方で実行してクロスブラウザ互換性を検証する
+      instances: [{ browser: 'chromium' }, { browser: 'firefox' }],
     },
   },
 });
