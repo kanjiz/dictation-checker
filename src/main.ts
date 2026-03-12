@@ -4,9 +4,10 @@
  * スクリーンリーダー向けのアクセシビリティ通知を管理します。
  */
 
-import { handleKeydown } from './player.ts';
+import { handlePlayerKeydown } from './player.ts';
 import { DEFAULT_SHORTCUTS } from './shortcuts.ts';
 import { handleAudioFile } from './audio.ts';
+import { handleDownloadKeydown } from './download.ts';
 
 /** 音声再生用のHTMLAudioElement */
 const player = document.getElementById('player') as HTMLAudioElement;
@@ -23,10 +24,14 @@ const statusRegion = document.getElementById('status-region') as HTMLDivElement;
 /** エラーメッセージを表示するための要素 */
 const audioError = document.getElementById('audio-error') as HTMLParagraphElement;
 
+/** ダウンロード完了ステータスを表示するための要素 */
+const downloadStatus = document.getElementById('download-status') as HTMLParagraphElement;
+
 /**
  * 指定されたメッセージをスクリーンリーダーに通知します。
  * aria-live="polite" が設定された領域の内容を更新することで読み上げを発生させます。
- * * @param {string} message - 通知する文字列
+ *
+ * @param {string} message - 通知する文字列
  */
 const announce = (message: string): void => {
   statusRegion.textContent = "";
@@ -56,6 +61,7 @@ audioInput.addEventListener('change', (e: Event) => {
   }
 });
 
-editor.addEventListener('keydown', (e: KeyboardEvent) => {
-  handleKeydown(e, player, DEFAULT_SHORTCUTS, announce);
+editor.addEventListener('keydown', (event: KeyboardEvent) => {
+  handleDownloadKeydown(event, editor, downloadStatus, DEFAULT_SHORTCUTS, announce);
+  handlePlayerKeydown(event, player, DEFAULT_SHORTCUTS, announce);
 });
