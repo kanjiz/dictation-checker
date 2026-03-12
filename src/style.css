@@ -107,3 +107,9 @@ kbd {
   font-weight: bold;
   margin-top: 0.25rem;
 }
+
+#download-status {
+  color: #006600;
+  font-weight: bold;
+  margin-top: 0.25rem;
+}
