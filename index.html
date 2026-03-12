@@ -23,8 +23,9 @@
         <h2 id="setup-title" class="visually-hidden">音声設定</h2>
         <div class="field">
           <label for="audioFile">音声ファイルを選択してください</label>
-          <input type="file" id="audioFile" accept="audio/*" aria-describedby="audio-help">
+          <input type="file" id="audioFile" accept="audio/*" aria-describedby="audio-help audio-error">
           <p id="audio-help" class="visually-hidden">ファイルを選択すると、自動的にプレイヤーに読み込まれます。</p>
+          <p id="audio-error" role="alert" hidden></p>
         </div>
       </section>
 

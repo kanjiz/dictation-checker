@@ -6,6 +6,7 @@
 
 import { handleKeydown } from './player.ts';
 import { DEFAULT_SHORTCUTS } from './shortcuts.ts';
+import { handleAudioFile } from './audio.ts';
 
 /** 音声再生用のHTMLAudioElement */
 const player = document.getElementById('player') as HTMLAudioElement;
@@ -18,6 +19,9 @@ const audioInput = document.getElementById('audioFile') as HTMLInputElement;
 
 /** スクリーンリーダーへの通知を行うためのライブリージョン（div要素） */
 const statusRegion = document.getElementById('status-region') as HTMLDivElement;
+
+/** エラーメッセージを表示するための要素 */
+const audioError = document.getElementById('audio-error') as HTMLParagraphElement;
 
 /**
  * 指定されたメッセージをスクリーンリーダーに通知します。
@@ -43,22 +47,12 @@ const announce = (message: string): void => {
 
 /**
  * ファイル選択時の処理。
- * 選択されたファイルをプレイヤーにセットし、エディタへフォーカスを移動します。
+ * 選択されたファイルをプレイヤーにセットし、成功時はエディタへ、エラー時はファイル入力にフォーカスを移動します。
  */
 audioInput.addEventListener('change', (e: Event) => {
-  const target = e.target as HTMLInputElement;
-  const file = target.files?.[0];
-
+  const file = (e.target as HTMLInputElement).files?.[0];
   if (file) {
-    if (player.src.startsWith('blob:')) {
-      URL.revokeObjectURL(player.src);
-    }
-
-    const url = URL.createObjectURL(file);
-    player.src = url;
-
-    announce("音声を読み込みました。入力エリアに移動します。");
-    editor.focus();
+    void handleAudioFile(file, player, audioError, editor, announce, audioInput);
   }
 });
 
