@@ -101,3 +101,9 @@ kbd {
   font-family: sans-serif; /* ショートカット記号は見慣れたフォントで */
   font-weight: bold;
 }
+
+#audio-error {
+  color: #c00;
+  font-weight: bold;
+  margin-top: 0.25rem;
+}
