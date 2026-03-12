@@ -94,6 +94,7 @@ async function handleAudioFile(
 | 無効ファイル選択時 | エラー要素にメッセージがセットされ `hidden` が外れる、`editor.focus()` は呼ばれない、`announce` は呼ばれない |
 | 2回目のファイル選択時 | 呼び出し開始時点でエラー要素が `hidden` に戻りテキストがクリアされる |
 | BlobURL の解放（エラー時） | `URL.revokeObjectURL` が呼ばれる |
+| 成功→エラーのシーケンス | 成功後の2回目選択で前回の BlobURL が `URL.revokeObjectURL` で解放される |
 | レースコンディション | 2回目の選択後に1回目のPromiseが解決しても `editor.focus()` が呼ばれない |
 
 ## ファイル変更一覧

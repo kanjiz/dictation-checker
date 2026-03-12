@@ -115,6 +115,27 @@ describe('handleAudioFile', () => {
   });
 
   describe('2回目のファイル選択時', () => {
+    it('成功後の2回目選択で前回の BlobURL が解放される', async () => {
+      let callIndex = 0;
+      vi.spyOn(player, 'addEventListener').mockImplementation((event, handler) => {
+        callIndex++;
+        if (callIndex === 1 && event === 'loadedmetadata') {
+          (handler as EventListener)(new Event(event)); // 1回目: 成功
+        } else if (callIndex === 4 && event === 'error') {
+          (handler as EventListener)(new Event(event)); // 2回目: エラー
+        }
+      });
+
+      // 1回目: 成功
+      await handleAudioFile(file, player, audioError, editor, announce, audioInput);
+      const firstUrl = vi.mocked(URL.createObjectURL).mock.results.at(-1)!.value as string;
+      vi.mocked(URL.revokeObjectURL).mockClear();
+
+      // 2回目: エラー（1回目の成功 URL が解放されるはず）
+      await handleAudioFile(file, player, audioError, editor, announce, audioInput);
+      expect(URL.revokeObjectURL).toHaveBeenCalledWith(firstUrl);
+    });
+
     it('呼び出し開始時点で前回のエラーがリセットされる', async () => {
       // addEventListener の呼び出し順：
       //   1: loadedmetadata (1回目), 2: error (1回目) → エラーを発火して1回目失敗
