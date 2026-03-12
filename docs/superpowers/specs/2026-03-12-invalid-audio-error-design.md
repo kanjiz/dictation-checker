@@ -60,7 +60,7 @@ async function handleAudioFile(
 2. モジュールスコープの `currentBlobUrl` に新しい URL を記録する（レースコンディション対策）
 3. `tryLoadAudio` を await する
 4. **成功時**：`currentBlobUrl` が現在の URL と一致することを確認し、`announce("音声を読み込みました。入力エリアに移動します。")` → `editor.focus()`
-5. **失敗時（catch）**：`currentBlobUrl` が現在の URL と一致することを確認し、BlobURL を解放 → `player.src = ''` → エラー要素にメッセージをセットして `hidden` を外す（`announce` は呼ばない）
+5. **失敗時（catch）**：`currentBlobUrl` が現在の URL と一致することを確認し、BlobURL を解放 → `player.removeAttribute('src')` → `player.load()`（メディア要素の状態を完全リセット）→ エラー要素にメッセージをセットして `hidden` を外す（`announce` は呼ばない）
 
 エラーメッセージ文字列：`"再生できないファイルです"`
 
