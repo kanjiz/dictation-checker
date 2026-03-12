@@ -47,7 +47,7 @@ const announce = (message: string): void => {
 
 /**
  * ファイル選択時の処理。
- * 選択されたファイルをプレイヤーにセットし、エディタへフォーカスを移動します。
+ * 選択されたファイルをプレイヤーにセットし、成功時はエディタへ、エラー時はファイル入力にフォーカスを移動します。
  */
 audioInput.addEventListener('change', (e: Event) => {
   const file = (e.target as HTMLInputElement).files?.[0];
