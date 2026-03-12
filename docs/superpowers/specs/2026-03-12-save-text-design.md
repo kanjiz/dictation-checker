@@ -153,6 +153,7 @@ jsdom 環境では `URL.createObjectURL` / `URL.revokeObjectURL` が未実装の
 | `index.html` | 変更（`download-status` 要素追加、`aria-keyshortcuts` 更新、ショートカット一覧に Ctrl+S 追記） |
 | `src/shortcuts.ts` | 変更（`ShortcutConfig` に `download` を追加） |
 | `src/player.ts` | 変更（`handleKeydown` → `handlePlayerKeydown`、引数 `s` → `shortcut`、`config` → `shortcuts` に改名） |
+| `src/player.test.ts` | 変更（`handleKeydown` → `handlePlayerKeydown` の import 更新） |
 | `src/download.ts` | 新規作成 |
 | `src/download.test.ts` | 新規作成 |
 | `src/main.ts` | 変更（`handleDownloadKeydown` 呼び出し追加） |
