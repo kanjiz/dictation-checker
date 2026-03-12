@@ -34,5 +34,20 @@ export function handleDownloadKeydown(
   shortcuts: ShortcutConfig,
   announce: (message: string) => void,
 ): void {
-  // stub placeholder — implemented in Task 5
+  if (!(event.ctrlKey === shortcuts.download.ctrl && event.key === shortcuts.download.key)) return;
+  event.preventDefault();
+
+  const filename = generateFilename(new Date());
+  downloadText(editor.value, filename);
+  announce('保存しました');
+
+  downloadStatus.removeAttribute('hidden');
+  downloadStatus.textContent = '保存しました';
+
+  if (hideTimer !== null) clearTimeout(hideTimer);
+  hideTimer = setTimeout(() => {
+    downloadStatus.setAttribute('hidden', '');
+    downloadStatus.textContent = '';
+    hideTimer = null;
+  }, 2000);
 }
