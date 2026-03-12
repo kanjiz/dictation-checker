@@ -64,10 +64,13 @@ export function handleSaveKeydown(
   editor: HTMLTextAreaElement,
   saveStatus: HTMLElement,
   announce: (message: string) => void,
+  shortcut: ShortcutKey,
 ): void
 ```
 
-Ctrl+S を検出したとき：
+`shortcuts.ts` の `ShortcutKey` 型を受け取り、ハードコードを避ける。`shortcut.key` と `shortcut.ctrl` を使ってキーを照合する。
+
+`shortcut` に一致するキーを検出したとき：
 
 1. `e.preventDefault()` でブラウザのページ保存を抑止する
 2. `generateFilename(new Date())` でファイル名を生成する
@@ -78,7 +81,27 @@ Ctrl+S を検出したとき：
 
 Ctrl+S 連打時、`announce()` は保存ごとに呼ばれる。`announce()` 内部には `textContent === message` のガードがあるため、累積タイマーがあっても最後の呼び出しから2秒後に一度だけ `statusRegion` がクリアされる（既存の動作に委ねる）。`saveStatus` の非表示タイマーは `clearTimeout` で前回分をキャンセルしてから新たにセットし、「最後の保存から2秒間」視覚表示が維持されるようにする。`saveStatus` と `#status-region` の非表示タイミングは独立しており、これは意図した設計である。
 
-Ctrl+S 以外のキーは何もしない。
+`shortcut` に一致しないキーは何もしない。
+
+### shortcuts.ts の変更
+
+`ShortcutConfig` に `save` を追加し、`DEFAULT_SHORTCUTS` にデフォルト値を追加する。
+
+```typescript
+export type ShortcutConfig = {
+  readonly playPause:   ShortcutKey;
+  readonly seekBack:    ShortcutKey;
+  readonly seekForward: ShortcutKey;
+  readonly save:        ShortcutKey;
+};
+
+export const DEFAULT_SHORTCUTS: ShortcutConfig = {
+  playPause:   { key: 'Enter',      ctrl: true },
+  seekBack:    { key: 'ArrowLeft',  ctrl: true },
+  seekForward: { key: 'ArrowRight', ctrl: true },
+  save:        { key: 's',          ctrl: true },
+} as const;
+```
 
 ### main.ts
 
@@ -86,7 +109,7 @@ Ctrl+S 以外のキーは何もしない。
 
 ```typescript
 editor.addEventListener('keydown', (e: KeyboardEvent) => {
-  handleSaveKeydown(e, editor, saveStatus, announce);
+  handleSaveKeydown(e, editor, saveStatus, announce, DEFAULT_SHORTCUTS.save);
   handleKeydown(e, player, DEFAULT_SHORTCUTS, announce);
 });
 ```
@@ -121,13 +144,14 @@ jsdom 環境では `URL.createObjectURL` / `URL.revokeObjectURL` が未実装の
 | Ctrl+S で保存される | `saveText` が呼ばれ、`announce` が呼ばれ、`save-status` が表示される |
 | 2秒後にステータスが非表示になる | `hidden` が付与される |
 | Ctrl+S 連打時 | `announce` が保存ごとに呼ばれ、`saveStatus` の非表示タイマーはリセットされ最後の保存から2秒後に `hidden` が付与される |
-| 他のキーは無視 | Ctrl+S 以外で `saveText` が呼ばれない |
+| 他のキーは無視 | `shortcut` に一致しないキーで `saveText` が呼ばれない |
 
 ## ファイル変更一覧
 
 | ファイル | 変更種別 |
 | --- | --- |
 | `index.html` | 変更（`save-status` 要素追加、`aria-keyshortcuts` 更新、ショートカット一覧に Ctrl+S 追記） |
+| `src/shortcuts.ts` | 変更（`ShortcutConfig` に `save` を追加） |
 | `src/save.ts` | 新規作成 |
 | `src/save.test.ts` | 新規作成 |
 | `src/main.ts` | 変更（`handleSaveKeydown` 呼び出し追加） |
