@@ -14,7 +14,7 @@ describe('handleAudioFile', () => {
   let player: HTMLAudioElement;
   let audioError: HTMLParagraphElement;
   let editor: HTMLTextAreaElement;
-  let announce: ReturnType<typeof vi.fn>;
+  let announce: ReturnType<typeof vi.fn<(message: string) => void>>;
   let file: File;
 
   beforeEach(() => {
