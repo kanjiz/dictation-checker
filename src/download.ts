@@ -14,7 +14,13 @@ export function generateFilename(date: Date): string {
 
 /** テキストをブラウザのダウンロード機能でファイルとして保存する */
 export function downloadText(text: string, filename: string): void {
-  // stub placeholder — implemented in Task 4
+  const blob = new Blob([text], { type: 'text/plain; charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
 }
 
 /** モジュールスコープで非表示タイマーを保持（連打時のリセットに使用） */

@@ -17,3 +17,34 @@ describe('generateFilename', () => {
     expect(generateFilename(date)).toBe('dictation-20260312-143022.txt');
   });
 });
+
+describe('downloadText', () => {
+  let clickSpy: ReturnType<typeof vi.spyOn>;
+
+  beforeEach(() => {
+    clickSpy = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {});
+    vi.mocked(URL.createObjectURL).mockClear();
+  });
+
+  afterEach(() => {
+    clickSpy.mockRestore();
+  });
+
+  it('通常テキストのダウンロード — createObjectURL と click が呼ばれる', () => {
+    downloadText('hello world', 'test.txt');
+    expect(URL.createObjectURL).toHaveBeenCalledOnce();
+    expect(clickSpy).toHaveBeenCalledOnce();
+  });
+
+  it('空テキストでも動作する', () => {
+    downloadText('', 'empty.txt');
+    expect(URL.createObjectURL).toHaveBeenCalledOnce();
+    expect(clickSpy).toHaveBeenCalledOnce();
+  });
+
+  it('ダウンロード後に revokeObjectURL でURLを解放する', () => {
+    vi.mocked(URL.revokeObjectURL).mockClear();
+    downloadText('text', 'test.txt');
+    expect(URL.revokeObjectURL).toHaveBeenCalledOnce();
+  });
+});
