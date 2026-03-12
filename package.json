@@ -13,13 +13,17 @@
     "test": "vitest run --reporter=verbose",
     "test:watch": "vitest --reporter=verbose",
     "type-check": "tsc --noEmit",
-    "lint:md": "markdownlint-cli2 \"**/*.md\""
+    "lint:md": "markdownlint-cli2 \"**/*.md\"",
+    "lint:css": "stylelint \"src/**/*.css\""
   },
   "devDependencies": {
     "@vitest/browser": "^4.0.18",
     "@vitest/browser-playwright": "^4.0.18",
     "markdownlint-cli2": "^0.21.0",
     "playwright": "^1.58.2",
+    "stylelint": "^17.4.0",
+    "stylelint-config-recess-order": "^7.6.1",
+    "stylelint-config-standard": "^40.0.0",
     "typescript": "~5.9.3",
     "vite": "^7.3.1",
     "vitest": "^4.0.18"
