@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { handleKeydown } from './player.ts';
+import { handlePlayerKeydown } from './player.ts';
 import { DEFAULT_SHORTCUTS } from './shortcuts.ts';
 
 /**
@@ -17,7 +17,7 @@ function mockCurrentTime(player: HTMLAudioElement, initial = 0): { get: () => nu
   return { get: () => value };
 }
 
-describe('handleKeydown', () => {
+describe('handlePlayerKeydown', () => {
   let player: HTMLAudioElement;
   let announce: ReturnType<typeof vi.fn<(message: string) => void>>;
 
@@ -35,7 +35,7 @@ describe('handleKeydown', () => {
       bubbles: true,
       cancelable: true,
     });
-    handleKeydown(event, player, DEFAULT_SHORTCUTS, announce);
+    handlePlayerKeydown(event, player, DEFAULT_SHORTCUTS, announce);
     return event;
   };
 
