@@ -6,8 +6,8 @@
 
 ## 要件
 
-- Ctrl+S でテキストエリアの内容をファイルに保存する
-- ファイル名は日時ベース（`dictation-YYYYMMDD-HHMMSS.txt`）
+- Ctrl+S でテキストエリアの内容をファイルに保存する（Windows 対応）
+- ファイル名は日時ベース（`dictation-YYYYMMDD-HHMMSS.txt`、ローカル時刻）
 - 保存先はブラウザのダウンロードフォルダ（ダイアログなし）
 - テキストが空でも保存する
 - 保存後にスクリーンリーダーへ通知（全盲ユーザー向け）
@@ -20,11 +20,13 @@
 テキストエリアの直後に保存ステータス要素を追加し、フッターのショートカット一覧に Ctrl+S を追記する。
 
 ```html
-<textarea id="editor" aria-keyshortcuts="Control+Enter Control+ArrowLeft Control+S" ...></textarea>
-<p id="save-status" aria-live="polite" hidden></p>
+<textarea id="editor" aria-keyshortcuts="Control+Enter Control+ArrowLeft Control+ArrowRight Control+S" ...></textarea>
+<p id="save-status" hidden></p>
 ```
 
-- `aria-live="polite"` により、`hidden` が外れた時点でスクリーンリーダーが読み上げる
+- `aria-keyshortcuts` は現行値（`"Control+Enter Control+ArrowLeft"`）に `Control+ArrowRight`（既存の漏れを修正）と `Control+S` を追加した完成形
+- `aria-live` は付与しない（スクリーンリーダー通知は既存の `#status-region` + `announce()` に統一）
+- `save-status` は視覚表示専用
 - 初期状態は `hidden` で非表示
 - テキストは JS 側でセット
 
@@ -44,7 +46,7 @@
 export function generateFilename(date: Date): string
 ```
 
-`Date` オブジェクトを受け取り、`dictation-YYYYMMDD-HHMMSS.txt` 形式の文字列を返す。`Date` を引数にすることでテストが書きやすくなる。
+`Date` オブジェクトを受け取り、ローカル時刻で `dictation-YYYYMMDD-HHMMSS.txt` 形式の文字列を返す。`Date` を引数にすることでテストが書きやすくなる。
 
 #### `saveText`（公開インターフェース）
 
@@ -61,6 +63,7 @@ export function handleSaveKeydown(
   e: KeyboardEvent,
   editor: HTMLTextAreaElement,
   saveStatus: HTMLElement,
+  announce: (message: string) => void,
 ): void
 ```
 
@@ -69,8 +72,11 @@ Ctrl+S を検出したとき：
 1. `e.preventDefault()` でブラウザのページ保存を抑止する
 2. `generateFilename(new Date())` でファイル名を生成する
 3. `saveText(editor.value, filename)` でファイルを保存する
-4. `saveStatus` の `hidden` を外し、テキストを「保存しました」にセットする
-5. 2秒後に `saveStatus` に `hidden` を付与してテキストをクリアする
+4. `announce('保存しました')` でスクリーンリーダーに通知する
+5. `saveStatus` の `hidden` を外し、テキストを「保存しました」にセットする
+6. 2秒後に `saveStatus` に `hidden` を付与してテキストをクリアする
+
+Ctrl+S 連打時、`announce()` は保存ごとに呼ばれる。`announce()` 内部には `textContent === message` のガードがあるため、累積タイマーがあっても最後の呼び出しから2秒後に一度だけ `statusRegion` がクリアされる（既存の動作に委ねる）。`saveStatus` の非表示タイマーは `clearTimeout` で前回分をキャンセルしてから新たにセットし、「最後の保存から2秒間」視覚表示が維持されるようにする。`saveStatus` と `#status-region` の非表示タイミングは独立しており、これは意図した設計である。
 
 Ctrl+S 以外のキーは何もしない。
 
@@ -80,7 +86,7 @@ Ctrl+S 以外のキーは何もしない。
 
 ```typescript
 editor.addEventListener('keydown', (e: KeyboardEvent) => {
-  handleSaveKeydown(e, editor, saveStatus);
+  handleSaveKeydown(e, editor, saveStatus, announce);
   handleKeydown(e, player, DEFAULT_SHORTCUTS, announce);
 });
 ```
@@ -105,13 +111,16 @@ editor.addEventListener('keydown', (e: KeyboardEvent) => {
 
 `generateFilename`・`saveText`・`handleSaveKeydown` の単体テストを vitest で追加する。
 
+jsdom 環境では `URL.createObjectURL` / `URL.revokeObjectURL` が未実装のため、`beforeAll` でスタブを貼る（`audio.test.ts` と同じパターン）。
+
 | テストケース | 確認内容 |
 | --- | --- |
 | `generateFilename` | `dictation-YYYYMMDD-HHMMSS.txt` 形式の文字列を返す |
 | 通常テキストの保存 | `URL.createObjectURL` が呼ばれ、`<a>` の `click` が呼ばれる |
 | 空テキストの保存 | 空でも `saveText` が正常に動作する |
-| Ctrl+S で保存される | `saveText` が呼ばれ、`save-status` が表示される |
+| Ctrl+S で保存される | `saveText` が呼ばれ、`announce` が呼ばれ、`save-status` が表示される |
 | 2秒後にステータスが非表示になる | `hidden` が付与される |
+| Ctrl+S 連打時 | `announce` が保存ごとに呼ばれ、`saveStatus` の非表示タイマーはリセットされ最後の保存から2秒後に `hidden` が付与される |
 | 他のキーは無視 | Ctrl+S 以外で `saveText` が呼ばれない |
 
 ## ファイル変更一覧
