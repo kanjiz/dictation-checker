@@ -16,6 +16,7 @@ describe('handleAudioFile', () => {
   let editor: HTMLTextAreaElement;
   let announce: ReturnType<typeof vi.fn<(message: string) => void>>;
   let file: File;
+  let audioInput: HTMLInputElement;
 
   beforeEach(() => {
     player = document.createElement('audio');
@@ -29,6 +30,10 @@ describe('handleAudioFile', () => {
 
     announce = vi.fn();
     file = new File(['audio'], 'test.mp3', { type: 'audio/mpeg' });
+
+    audioInput = document.createElement('input');
+    audioInput.type = 'file';
+    vi.spyOn(audioInput, 'focus');
   });
 
   describe('正常ファイル選択時', () => {
@@ -41,18 +46,23 @@ describe('handleAudioFile', () => {
     });
 
     it('editor.focus() が呼ばれる', async () => {
-      await handleAudioFile(file, player, audioError, editor, announce);
+      await handleAudioFile(file, player, audioError, editor, announce, audioInput);
       expect(editor.focus).toHaveBeenCalledOnce();
     });
 
     it('announce が正しいメッセージで呼ばれる', async () => {
-      await handleAudioFile(file, player, audioError, editor, announce);
+      await handleAudioFile(file, player, audioError, editor, announce, audioInput);
       expect(announce).toHaveBeenCalledWith('音声を読み込みました。入力エリアに移動します。');
     });
 
     it('エラー要素が hidden のまま', async () => {
-      await handleAudioFile(file, player, audioError, editor, announce);
+      await handleAudioFile(file, player, audioError, editor, announce, audioInput);
       expect(audioError.hidden).toBe(true);
+    });
+
+    it('audioInput.focus() は呼ばれない', async () => {
+      await handleAudioFile(file, player, audioError, editor, announce, audioInput);
+      expect(audioInput.focus).not.toHaveBeenCalled();
     });
   });
 
@@ -66,24 +76,29 @@ describe('handleAudioFile', () => {
     });
 
     it('エラー要素にメッセージがセットされ hidden が外れる', async () => {
-      await handleAudioFile(file, player, audioError, editor, announce);
+      await handleAudioFile(file, player, audioError, editor, announce, audioInput);
       expect(audioError.hidden).toBe(false);
       expect(audioError.textContent).toBe('再生できないファイルです');
     });
 
     it('editor.focus() は呼ばれない', async () => {
-      await handleAudioFile(file, player, audioError, editor, announce);
+      await handleAudioFile(file, player, audioError, editor, announce, audioInput);
       expect(editor.focus).not.toHaveBeenCalled();
     });
 
     it('announce は呼ばれない', async () => {
-      await handleAudioFile(file, player, audioError, editor, announce);
+      await handleAudioFile(file, player, audioError, editor, announce, audioInput);
       expect(announce).not.toHaveBeenCalled();
     });
 
     it('URL.revokeObjectURL が呼ばれる', async () => {
-      await handleAudioFile(file, player, audioError, editor, announce);
+      await handleAudioFile(file, player, audioError, editor, announce, audioInput);
       expect(URL.revokeObjectURL).toHaveBeenCalled();
+    });
+
+    it('audioInput.focus() が呼ばれる', async () => {
+      await handleAudioFile(file, player, audioError, editor, announce, audioInput);
+      expect(audioInput.focus).toHaveBeenCalledOnce();
     });
   });
 
@@ -103,11 +118,11 @@ describe('handleAudioFile', () => {
       });
 
       // 1回目: エラー状態にする
-      await handleAudioFile(file, player, audioError, editor, announce);
+      await handleAudioFile(file, player, audioError, editor, announce, audioInput);
       expect(audioError.hidden).toBe(false);
 
       // 2回目: エラーがリセットされ、成功する
-      await handleAudioFile(file, player, audioError, editor, announce);
+      await handleAudioFile(file, player, audioError, editor, announce, audioInput);
       expect(audioError.hidden).toBe(true);
       expect(audioError.textContent).toBe('');
     });
@@ -127,10 +142,10 @@ describe('handleAudioFile', () => {
       const file2 = new File(['audio'], 'test2.mp3', { type: 'audio/mpeg' });
 
       // 1回目の呼び出し（loadedmetadata は発火しない → Promise 保留）
-      const first = handleAudioFile(file, player, audioError, editor, announce);
+      const first = handleAudioFile(file, player, audioError, editor, announce, audioInput);
 
       // 2回目の呼び出し（currentBlobUrl が上書きされる）
-      const second = handleAudioFile(file2, player, audioError, editor, announce);
+      const second = handleAudioFile(file2, player, audioError, editor, announce, audioInput);
 
       // 2回目の loadedmetadata を発火して完了させる
       loadedHandlers[1]?.();

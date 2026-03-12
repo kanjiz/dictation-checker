@@ -52,7 +52,7 @@ const announce = (message: string): void => {
 audioInput.addEventListener('change', (e: Event) => {
   const file = (e.target as HTMLInputElement).files?.[0];
   if (file) {
-    void handleAudioFile(file, player, audioError, editor, announce);
+    void handleAudioFile(file, player, audioError, editor, announce, audioInput);
   }
 });
 

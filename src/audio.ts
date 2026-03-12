@@ -26,6 +26,7 @@ function tryLoadAudio(player: HTMLAudioElement, url: string): Promise<void> {
  * @param audioError - エラーメッセージ表示用の要素
  * @param editor     - フォーカス先のテキストエリア
  * @param announce   - スクリーンリーダー通知関数
+ * @param audioInput - ファイル入力要素（エラー時のフォーカス戻し先）
  */
 export async function handleAudioFile(
   file: File,
@@ -33,6 +34,7 @@ export async function handleAudioFile(
   audioError: HTMLElement,
   editor: HTMLTextAreaElement,
   announce: (message: string) => void,
+  audioInput: HTMLInputElement,
 ): Promise<void> {
   // 0. エラー要素をリセット
   audioError.hidden = true;
@@ -63,5 +65,6 @@ export async function handleAudioFile(
 
     audioError.textContent = '再生できないファイルです';
     audioError.hidden = false;
+    audioInput.focus();
   }
 }
