@@ -10,6 +10,7 @@ beforeAll(() => {
   });
 });
 
+
 describe('handleAudioFile', () => {
   let player: HTMLAudioElement;
   let audioError: HTMLParagraphElement;
@@ -34,6 +35,9 @@ describe('handleAudioFile', () => {
     audioInput = document.createElement('input');
     audioInput.type = 'file';
     vi.spyOn(audioInput, 'focus');
+
+    // テストをまたいで累積する revokeObjectURL の呼び出し記録をクリアする
+    vi.mocked(URL.revokeObjectURL).mockClear();
   });
 
   describe('正常ファイル選択時', () => {
@@ -91,9 +95,17 @@ describe('handleAudioFile', () => {
       expect(announce).not.toHaveBeenCalled();
     });
 
-    it('URL.revokeObjectURL が呼ばれる', async () => {
+    it('エラー URL の revokeObjectURL が呼ばれる', async () => {
       await handleAudioFile(file, player, audioError, editor, announce, audioInput);
-      expect(URL.revokeObjectURL).toHaveBeenCalled();
+      // エラーパスでは生成した BlobURL を解放する
+      expect(URL.revokeObjectURL).toHaveBeenCalledWith(expect.stringContaining('blob:mock-url-'));
+    });
+
+    it('player の src が除去され load() が再呼び出しされる', async () => {
+      // tryLoadAudio 内で 1 回、catch ブロックで 1 回、計 2 回呼ばれる
+      await handleAudioFile(file, player, audioError, editor, announce, audioInput);
+      expect(player.load).toHaveBeenCalledTimes(2);
+      expect(player.hasAttribute('src')).toBe(false);
     });
 
     it('audioInput.focus() が呼ばれる', async () => {
