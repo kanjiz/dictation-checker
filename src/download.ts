@@ -34,7 +34,7 @@ export function handleDownloadKeydown(
   shortcuts: ShortcutConfig,
   announce: (message: string) => void,
 ): void {
-  if (!(event.ctrlKey === shortcuts.download.ctrl && event.key === shortcuts.download.key)) return;
+  if (!(event.ctrlKey === shortcuts.download.modifier && event.key === shortcuts.download.key)) return;
   event.preventDefault();
 
   const filename = generateFilename(new Date());
