@@ -1,6 +1,13 @@
 import type { ShortcutConfig, ShortcutKey } from './shortcuts.ts';
 
-// 注意: この ctrlKey 参照は Task 7 で keyboard.ts の matches() に置き換える（中間状態）
+/**
+ * キーボードイベントがショートカット定義にマッチするかを判定する。
+ *
+ * @remarks 中間状態: ctrlKey 固定判定。Task 7 で keyboard.ts の matches() に置き換える。
+ * @param event    - 判定対象のキーボードイベント
+ * @param shortcut - ショートカット定義
+ * @returns マッチするとき `true`
+ */
 function matches(event: KeyboardEvent, shortcut: ShortcutKey): boolean {
   return event.ctrlKey === shortcut.modifier && event.key === shortcut.key;
 }
