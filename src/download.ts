@@ -1,4 +1,5 @@
 import type { ShortcutConfig } from './shortcuts.ts';
+import { isMac, matches } from './keyboard.ts';
 
 /** ローカル時刻で dictation-YYYYMMDD-HHMMSS.txt 形式のファイル名を生成する */
 export function generateFilename(date: Date): string {
@@ -26,15 +27,31 @@ export function downloadText(text: string, filename: string): void {
 /** モジュールスコープで非表示タイマーを保持（連打時のリセットに使用） */
 let hideTimer: ReturnType<typeof setTimeout> | null = null;
 
-/** Ctrl+S キーダウンイベントを処理してテキストをダウンロードする */
+/**
+ * キーダウンイベントをショートカット設定に従って処理し、テキストをダウンロードする。
+ *
+ * ダウンロードショートカット（Mac: ⌘+S、Windows/Linux: Ctrl+S）が押されたとき:
+ * - タイムスタンプ付きファイル名でテキストエリアの内容をダウンロードする
+ * - ステータス要素に「保存しました」を 2 秒間表示する（連打時はタイマーをリセット）
+ * - スクリーンリーダーに「保存しました」と通知する
+ *
+ * @param event          - 発火したキーボードイベント
+ * @param editor         - ダウンロード対象のテキストエリア
+ * @param downloadStatus - ダウンロード完了を通知するステータス要素
+ * @param shortcuts      - ショートカット設定
+ * @param announce       - スクリーンリーダー通知関数
+ * @param mac            - Mac パスで判定するか（デフォルト: `isMac`）。
+ *                         テストから `false` を渡すことで OS に依存せずテスト可能。
+ */
 export function handleDownloadKeydown(
   event: KeyboardEvent,
   editor: HTMLTextAreaElement,
   downloadStatus: HTMLElement,
   shortcuts: ShortcutConfig,
   announce: (message: string) => void,
+  mac = isMac,
 ): void {
-  if (!(event.ctrlKey === shortcuts.download.ctrl && event.key === shortcuts.download.key)) return;
+  if (!matches(event, shortcuts.download, mac)) return;
   event.preventDefault();
 
   const filename = generateFilename(new Date());

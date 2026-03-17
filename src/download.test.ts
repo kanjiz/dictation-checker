@@ -73,7 +73,7 @@ describe('handleDownloadKeydown', () => {
 
   const fire = (key: string, ctrl: boolean) => {
     const event = new KeyboardEvent('keydown', { key, ctrlKey: ctrl, cancelable: true });
-    handleDownloadKeydown(event, editor, downloadStatus, DEFAULT_SHORTCUTS, announce);
+    handleDownloadKeydown(event, editor, downloadStatus, DEFAULT_SHORTCUTS, announce, false);
     return event;
   };
 

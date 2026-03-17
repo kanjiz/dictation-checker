@@ -8,6 +8,7 @@ import { handlePlayerKeydown } from './player.ts';
 import { DEFAULT_SHORTCUTS } from './shortcuts.ts';
 import { handleAudioFile } from './audio.ts';
 import { handleDownloadKeydown } from './download.ts';
+import { updateShortcutDisplay } from './keyboard.ts';
 
 /** 音声再生用のHTMLAudioElement */
 const player = document.getElementById('player') as HTMLAudioElement;
@@ -65,3 +66,6 @@ editor.addEventListener('keydown', (event: KeyboardEvent) => {
   handleDownloadKeydown(event, editor, downloadStatus, DEFAULT_SHORTCUTS, announce);
   handlePlayerKeydown(event, player, DEFAULT_SHORTCUTS, announce);
 });
+
+// 起動時にショートカット表示を初期化
+updateShortcutDisplay(DEFAULT_SHORTCUTS);
