@@ -1,6 +1,6 @@
-import { describe, it, expect } from 'vitest';
-import { matches } from './keyboard.ts';
-import type { ShortcutKey } from './shortcuts.ts';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { matches, updateShortcutDisplay } from './keyboard.ts';
+import { type ShortcutKey, DEFAULT_SHORTCUTS } from './shortcuts.ts';
 
 /** テスト用 KeyboardEvent を生成するヘルパー */
 function makeKeyEvent(
@@ -59,5 +59,62 @@ describe('matches()', () => {
     it('ctrlKey があるとマッチしない', () => {
       expect(matches(makeKeyEvent('Enter', { ctrlKey: true }), noModShortcut, false)).toBe(false);
     });
+  });
+});
+
+describe('updateShortcutDisplay()', () => {
+  let container: HTMLDivElement;
+
+  beforeEach(() => {
+    container = document.createElement('div');
+    document.body.appendChild(container);
+  });
+
+  afterEach(() => {
+    document.body.removeChild(container);
+  });
+
+  it('<kbd data-mod> の textContent が OS に応じた修飾キー表示に更新される', () => {
+    container.innerHTML = '<kbd data-mod>Ctrl</kbd>';
+    updateShortcutDisplay(DEFAULT_SHORTCUTS);
+    const kbd = container.querySelector<HTMLElement>('kbd[data-mod]');
+    // jsdom は非 Mac なので Ctrl になる
+    expect(kbd?.textContent).toBe('Ctrl');
+  });
+
+  it('<kbd data-key="playPause"> の textContent がキー表示に更新される', () => {
+    container.innerHTML = '<kbd data-key="playPause">Enter</kbd>';
+    updateShortcutDisplay(DEFAULT_SHORTCUTS);
+    const kbd = container.querySelector<HTMLElement>('kbd[data-key="playPause"]');
+    expect(kbd?.textContent).toBe('Enter');
+  });
+
+  it('<kbd data-key="seekBack"> の textContent が ← に更新される', () => {
+    container.innerHTML = '<kbd data-key="seekBack">←</kbd>';
+    updateShortcutDisplay(DEFAULT_SHORTCUTS);
+    const kbd = container.querySelector<HTMLElement>('kbd[data-key="seekBack"]');
+    expect(kbd?.textContent).toBe('←');
+  });
+
+  it('<kbd data-key="seekForward"> の textContent が → に更新される', () => {
+    container.innerHTML = '<kbd data-key="seekForward">→</kbd>';
+    updateShortcutDisplay(DEFAULT_SHORTCUTS);
+    const kbd = container.querySelector<HTMLElement>('kbd[data-key="seekForward"]');
+    expect(kbd?.textContent).toBe('→');
+  });
+
+  it('editor 要素の aria-keyshortcuts が更新される', () => {
+    container.innerHTML = '<div id="editor"></div>';
+    updateShortcutDisplay(DEFAULT_SHORTCUTS);
+    const editor = document.getElementById('editor');
+    // 非 Mac なので Control+... になる
+    expect(editor?.getAttribute('aria-keyshortcuts')).toContain('Control+Enter');
+  });
+
+  it('editor 要素の placeholder が更新される', () => {
+    container.innerHTML = '<div id="editor"></div>';
+    updateShortcutDisplay(DEFAULT_SHORTCUTS);
+    const editor = document.getElementById('editor');
+    expect(editor?.getAttribute('placeholder')).toBe('Ctrl + Enter で再生・一時停止');
   });
 });
