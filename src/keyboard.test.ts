@@ -76,44 +76,44 @@ describe('updateShortcutDisplay()', () => {
 
   it('<kbd data-mod> の textContent が OS に応じた修飾キー表示に更新される', () => {
     container.innerHTML = '<kbd data-mod>Ctrl</kbd>';
-    updateShortcutDisplay(DEFAULT_SHORTCUTS);
+    updateShortcutDisplay(DEFAULT_SHORTCUTS, false);
     const kbd = container.querySelector<HTMLElement>('kbd[data-mod]');
-    // jsdom は非 Mac なので Ctrl になる
+    // 非 Mac（mac = false）なので Ctrl になる
     expect(kbd?.textContent).toBe('Ctrl');
   });
 
   it('<kbd data-key="playPause"> の textContent がキー表示に更新される', () => {
     container.innerHTML = '<kbd data-key="playPause">Enter</kbd>';
-    updateShortcutDisplay(DEFAULT_SHORTCUTS);
+    updateShortcutDisplay(DEFAULT_SHORTCUTS, false);
     const kbd = container.querySelector<HTMLElement>('kbd[data-key="playPause"]');
     expect(kbd?.textContent).toBe('Enter');
   });
 
   it('<kbd data-key="seekBack"> の textContent が ← に更新される', () => {
     container.innerHTML = '<kbd data-key="seekBack">←</kbd>';
-    updateShortcutDisplay(DEFAULT_SHORTCUTS);
+    updateShortcutDisplay(DEFAULT_SHORTCUTS, false);
     const kbd = container.querySelector<HTMLElement>('kbd[data-key="seekBack"]');
     expect(kbd?.textContent).toBe('←');
   });
 
   it('<kbd data-key="seekForward"> の textContent が → に更新される', () => {
     container.innerHTML = '<kbd data-key="seekForward">→</kbd>';
-    updateShortcutDisplay(DEFAULT_SHORTCUTS);
+    updateShortcutDisplay(DEFAULT_SHORTCUTS, false);
     const kbd = container.querySelector<HTMLElement>('kbd[data-key="seekForward"]');
     expect(kbd?.textContent).toBe('→');
   });
 
   it('editor 要素の aria-keyshortcuts が更新される', () => {
     container.innerHTML = '<div id="editor"></div>';
-    updateShortcutDisplay(DEFAULT_SHORTCUTS);
+    updateShortcutDisplay(DEFAULT_SHORTCUTS, false);
     const editor = document.getElementById('editor');
-    // 非 Mac なので Control+... になる
+    // 非 Mac（mac = false）なので Control+... になる
     expect(editor?.getAttribute('aria-keyshortcuts')).toContain('Control+Enter');
   });
 
   it('editor 要素の placeholder が更新される', () => {
     container.innerHTML = '<div id="editor"></div>';
-    updateShortcutDisplay(DEFAULT_SHORTCUTS);
+    updateShortcutDisplay(DEFAULT_SHORTCUTS, false);
     const editor = document.getElementById('editor');
     expect(editor?.getAttribute('placeholder')).toBe('Ctrl + Enter で再生・一時停止');
   });
