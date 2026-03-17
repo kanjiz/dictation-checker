@@ -35,7 +35,8 @@ describe('handlePlayerKeydown', () => {
       bubbles: true,
       cancelable: true,
     });
-    handlePlayerKeydown(event, player, DEFAULT_SHORTCUTS, announce);
+    // mac = false を渡して OS によらず ctrlKey パスで判定する
+    handlePlayerKeydown(event, player, DEFAULT_SHORTCUTS, announce, false);
     return event;
   };
 
