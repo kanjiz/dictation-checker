@@ -1,4 +1,5 @@
 import type { ShortcutConfig } from './shortcuts.ts';
+import { isMac, matches } from './keyboard.ts';
 
 /** ローカル時刻で dictation-YYYYMMDD-HHMMSS.txt 形式のファイル名を生成する */
 export function generateFilename(date: Date): string {
@@ -33,8 +34,9 @@ export function handleDownloadKeydown(
   downloadStatus: HTMLElement,
   shortcuts: ShortcutConfig,
   announce: (message: string) => void,
+  mac = isMac,
 ): void {
-  if (!(event.ctrlKey === shortcuts.download.modifier && event.key === shortcuts.download.key)) return;
+  if (!matches(event, shortcuts.download, mac)) return;
   event.preventDefault();
 
   const filename = generateFilename(new Date());
