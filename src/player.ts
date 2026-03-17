@@ -2,13 +2,19 @@ import type { ShortcutConfig } from './shortcuts.ts';
 import { matches, isMac } from './keyboard.ts';
 
 /**
- * キーダウンイベントをショートカット設定に従って処理する。
+ * キーダウンイベントをショートカット設定に従って処理し、音声プレイヤーを操作する。
+ *
+ * 各ショートカット（Mac: ⌘、Windows/Linux: Ctrl）に応じて以下を実行する:
+ * - 再生/一時停止ショートカット: 再生中なら停止、停止中なら再生
+ * - 10秒戻るショートカット: currentTime を 10 秒戻す（0 以下にはならない）
+ * - 10秒進むショートカット: currentTime を 10 秒進める（duration を超えない）
  *
  * @param event     - 発火したキーボードイベント
  * @param player    - 操作対象の音声プレイヤー
  * @param shortcuts - ショートカット設定
  * @param announce  - スクリーンリーダー通知関数
- * @param mac       - Mac パスで判定するか（デフォルト: `isMac`）
+ * @param mac       - Mac パスで判定するか（デフォルト: `isMac`）。
+ *                    テストから `false` を渡すことで OS に依存せずテスト可能。
  */
 export function handlePlayerKeydown(
   event: KeyboardEvent,
