@@ -47,6 +47,8 @@ const keyDisplayMap: Readonly<Record<string, string>> = {
  * - `#editor[placeholder]` — 修飾キーラベルを含む案内文に更新
  *
  * @param shortcuts - 表示に反映するショートカット設定
+ * @param mac       - Mac パスで表示を更新するか（デフォルト: `isMac`）。
+ *                    テストから `false` を渡すことで OS に依存せずテスト可能。
  */
 export function updateShortcutDisplay(shortcuts: ShortcutConfig, mac = isMac): void {
   const modifierLabel  = mac ? '⌘'    : 'Ctrl';
