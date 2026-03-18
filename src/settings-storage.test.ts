@@ -131,4 +131,28 @@ describe('importSettings()', () => {
     });
     expect(error).toBeTruthy();
   });
+
+  it('shortcuts のエントリに key フィールドがない → onError が呼ばれる', async () => {
+    const malformedShortcuts = {
+      ...DEFAULT_SETTINGS.shortcuts,
+      playPause: { modifier: true }, // key フィールドなし
+    };
+    const file = makeFile(JSON.stringify({ version: 1, shortcuts: malformedShortcuts, seek: DEFAULT_SETTINGS.seek }));
+    const error = await new Promise<string>((resolve, reject) => {
+      importSettings(file, (s) => reject(new Error('unexpected success')), resolve);
+    });
+    expect(error).toBeTruthy();
+  });
+
+  it('seek.forwardSeconds が 0 → onError が呼ばれる', async () => {
+    const file = makeFile(JSON.stringify({
+      version: 1,
+      shortcuts: DEFAULT_SETTINGS.shortcuts,
+      seek: { backSeconds: 10, forwardSeconds: 0 },
+    }));
+    const error = await new Promise<string>((resolve, reject) => {
+      importSettings(file, (s) => reject(new Error('unexpected success')), resolve);
+    });
+    expect(error).toBeTruthy();
+  });
 });
