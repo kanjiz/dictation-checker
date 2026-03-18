@@ -43,18 +43,28 @@ describe('saveSettings()', () => {
 
 describe('exportSettings()', () => {
   let clickSpy: ReturnType<typeof vi.spyOn>;
+  let capturedAnchor: HTMLAnchorElement | undefined;
 
   beforeEach(() => {
     clickSpy = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {});
+    const original = document.createElement.bind(document);
+    capturedAnchor = undefined;
+    vi.spyOn(document, 'createElement').mockImplementation((tag: string) => {
+      const el = original(tag);
+      if (tag === 'a') capturedAnchor = el as HTMLAnchorElement;
+      return el;
+    });
   });
 
   afterEach(() => {
     clickSpy.mockRestore();
+    vi.mocked(document.createElement).mockRestore();
   });
 
   it('settings.json という名前でダウンロードが発火する', () => {
     exportSettings(DEFAULT_SETTINGS);
     expect(clickSpy).toHaveBeenCalledOnce();
+    expect(capturedAnchor?.download).toBe('settings.json');
   });
 });
 
