@@ -1,4 +1,4 @@
-import type { ShortcutConfig } from './shortcuts.ts';
+import type { ShortcutConfig } from './settings.ts';
 import { isMac, matches } from './keyboard.ts';
 
 /** ローカル時刻で dictation-YYYYMMDD-HHMMSS.txt 形式のファイル名を生成する */

@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeAll, beforeEach, afterEach } from 'vitest';
 import { generateFilename, downloadText, handleDownloadKeydown } from './download.ts';
-import { DEFAULT_SHORTCUTS } from './shortcuts.ts';
+import { DEFAULT_SETTINGS } from './settings.ts';
 
 // URL.createObjectURL / revokeObjectURL は jsdom 未実装のためモック
 let urlCounter = 0;
@@ -73,7 +73,7 @@ describe('handleDownloadKeydown', () => {
 
   const fire = (key: string, ctrl: boolean) => {
     const event = new KeyboardEvent('keydown', { key, ctrlKey: ctrl, cancelable: true });
-    handleDownloadKeydown(event, editor, downloadStatus, DEFAULT_SHORTCUTS, announce, false);
+    handleDownloadKeydown(event, editor, downloadStatus, DEFAULT_SETTINGS.shortcuts, announce, false);
     return event;
   };
 
