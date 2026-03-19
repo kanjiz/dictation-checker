@@ -53,12 +53,60 @@
         <h2 id="shortcut-title">操作案内（キーボードショートカット）</h2>
         <ul>
           <li><kbd data-mod>Ctrl</kbd> + <kbd data-key="playPause">Enter</kbd>: 再生 / 一時停止</li>
-          <li><kbd data-mod>Ctrl</kbd> + <kbd data-key="seekBack">←</kbd>: 10秒戻る</li>
-          <li><kbd data-mod>Ctrl</kbd> + <kbd data-key="seekForward">→</kbd>: 10秒進む</li>
+          <li><kbd data-mod>Ctrl</kbd> + <kbd data-key="seekBack">←</kbd>: <span data-seek="back">10</span>秒戻る</li>
+          <li><kbd data-mod>Ctrl</kbd> + <kbd data-key="seekForward">→</kbd>: <span data-seek="forward">10</span>秒進む</li>
           <li><kbd data-mod>Ctrl</kbd> + <kbd data-key="download">S</kbd>: 保存</li>
         </ul>
       </section>
     </footer>
+
+    <div id="settings-modal" hidden>
+      <h2>設定</h2>
+
+      <section>
+        <h3>ショートカット</h3>
+        <ul>
+          <li>
+            <span>再生 / 一時停止</span>
+            <button data-capture="playPause">Enter</button>
+            <label><input type="checkbox" data-modifier="playPause"> 修飾キー</label>
+            <span data-capture-error="playPause" hidden></span>
+          </li>
+          <li>
+            <span>戻る</span>
+            <button data-capture="seekBack">←</button>
+            <label><input type="checkbox" data-modifier="seekBack"> 修飾キー</label>
+            <span data-capture-error="seekBack" hidden></span>
+          </li>
+          <li>
+            <span>進む</span>
+            <button data-capture="seekForward">→</button>
+            <label><input type="checkbox" data-modifier="seekForward"> 修飾キー</label>
+            <span data-capture-error="seekForward" hidden></span>
+          </li>
+          <li>
+            <span>保存</span>
+            <button data-capture="download">s</button>
+            <label><input type="checkbox" data-modifier="download"> 修飾キー</label>
+            <span data-capture-error="download" hidden></span>
+          </li>
+        </ul>
+      </section>
+
+      <section>
+        <h3>シーク秒数</h3>
+        <label>戻る（秒）<input type="number" id="seekBackSeconds" min="1" max="60"></label>
+        <label>進む（秒）<input type="number" id="seekForwardSeconds" min="1" max="60"></label>
+      </section>
+
+      <div>
+        <button id="saveSettings">保存</button>
+        <button id="exportSettings">書き出し</button>
+        <label>読み込み<input type="file" id="importSettingsFile" accept=".json"></label>
+        <button id="resetSettings">リセット</button>
+        <p id="settings-error" hidden></p>
+      </div>
+    </div>
   </div>
 
   <script type="module" src="/src/main.ts"></script>
