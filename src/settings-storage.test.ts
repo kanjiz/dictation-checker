@@ -95,7 +95,7 @@ describe('importSettings()', () => {
   it('壊れた JSON → onError が呼ばれ localStorage は変更されない', async () => {
     const file = makeFile('not-json');
     const error = await new Promise<string>((resolve, reject) => {
-      importSettings(file, (s) => reject(new Error('unexpected success')), resolve);
+      importSettings(file, (_s) => reject(new Error('unexpected success')), resolve);
     });
     expect(error).toBeTruthy();
     expect(localStorage.getItem('settings')).toBeNull();
@@ -104,7 +104,7 @@ describe('importSettings()', () => {
   it('version が 1 以外 → onError が呼ばれる', async () => {
     const file = makeFile(JSON.stringify({ version: 2, shortcuts: DEFAULT_SETTINGS.shortcuts, seek: DEFAULT_SETTINGS.seek }));
     const error = await new Promise<string>((resolve, reject) => {
-      importSettings(file, (s) => reject(new Error('unexpected success')), resolve);
+      importSettings(file, (_s) => reject(new Error('unexpected success')), resolve);
     });
     expect(error).toBeTruthy();
   });
@@ -113,7 +113,7 @@ describe('importSettings()', () => {
     const { download: _omit, ...partialShortcuts } = DEFAULT_SETTINGS.shortcuts;
     const file = makeFile(JSON.stringify({ version: 1, shortcuts: partialShortcuts, seek: DEFAULT_SETTINGS.seek }));
     const error = await new Promise<string>((resolve, reject) => {
-      importSettings(file, (s) => reject(new Error('unexpected success')), resolve);
+      importSettings(file, (_s) => reject(new Error('unexpected success')), resolve);
     });
     expect(error).toBeTruthy();
   });
@@ -125,7 +125,7 @@ describe('importSettings()', () => {
     };
     const file = makeFile(JSON.stringify({ version: 1, shortcuts: duplicateShortcuts, seek: DEFAULT_SETTINGS.seek }));
     const error = await new Promise<string>((resolve, reject) => {
-      importSettings(file, (s) => reject(new Error('unexpected success')), resolve);
+      importSettings(file, (_s) => reject(new Error('unexpected success')), resolve);
     });
     expect(error).toBeTruthy();
   });
@@ -137,7 +137,7 @@ describe('importSettings()', () => {
       seek: { backSeconds: 0, forwardSeconds: 10 },
     }));
     const error = await new Promise<string>((resolve, reject) => {
-      importSettings(file, (s) => reject(new Error('unexpected success')), resolve);
+      importSettings(file, (_s) => reject(new Error('unexpected success')), resolve);
     });
     expect(error).toBeTruthy();
   });
@@ -149,7 +149,7 @@ describe('importSettings()', () => {
     };
     const file = makeFile(JSON.stringify({ version: 1, shortcuts: malformedShortcuts, seek: DEFAULT_SETTINGS.seek }));
     const error = await new Promise<string>((resolve, reject) => {
-      importSettings(file, (s) => reject(new Error('unexpected success')), resolve);
+      importSettings(file, (_s) => reject(new Error('unexpected success')), resolve);
     });
     expect(error).toBeTruthy();
   });
@@ -161,7 +161,7 @@ describe('importSettings()', () => {
       seek: { backSeconds: 10, forwardSeconds: 0 },
     }));
     const error = await new Promise<string>((resolve, reject) => {
-      importSettings(file, (s) => reject(new Error('unexpected success')), resolve);
+      importSettings(file, (_s) => reject(new Error('unexpected success')), resolve);
     });
     expect(error).toBeTruthy();
   });
