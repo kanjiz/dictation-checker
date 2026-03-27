@@ -49,7 +49,7 @@ function pressEsc(): void {
   document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true }));
 }
 
-let onSave: ReturnType<typeof vi.fn>;
+let onSave: ReturnType<typeof vi.fn<() => void>>;
 
 beforeEach(() => {
   document.body.innerHTML = MODAL_HTML;
