@@ -17,6 +17,7 @@ let activeCaptureName: keyof ShortcutConfig | null = null;
 let captureKeydownHandler: ((e: KeyboardEvent) => void) | null = null;
 let escKeydownHandler: ((e: KeyboardEvent) => void) | null = null;
 let _onSave: (() => void) | null = null;
+let buttonAbortController: AbortController | null = null;
 
 export function isModalOpen(): boolean { return _isModalOpen; }
 
@@ -30,6 +31,10 @@ export function initSettingsModal(onSave: () => void): void {
     captureKeydownHandler = null;
   }
 
+  // 既存のボタンリスナーをクリーンアップ
+  buttonAbortController?.abort();
+  buttonAbortController = new AbortController();
+
   // 状態リセット
   _isModalOpen = false;
   escCount = 0;
@@ -41,7 +46,7 @@ export function initSettingsModal(onSave: () => void): void {
   escKeydownHandler = handleEscKey;
   document.addEventListener('keydown', escKeydownHandler);
 
-  setupModalButtons();
+  setupModalButtons(buttonAbortController.signal);
 }
 
 function openModal(): void {
@@ -166,12 +171,12 @@ function cancelCapture(): void {
   activeCaptureName = null;
 }
 
-function setupModalButtons(): void {
+function setupModalButtons(signal: AbortSignal): void {
   document.querySelectorAll<HTMLButtonElement>('[data-capture]').forEach((btn) => {
     btn.addEventListener('click', () => {
       const name = btn.dataset['capture'] as keyof ShortcutConfig;
       startCapture(name);
-    });
+    }, { signal });
   });
 
   document.querySelectorAll<HTMLInputElement>('[data-modifier]').forEach((cb) => {
@@ -185,7 +190,7 @@ function setupModalButtons(): void {
           [name]: { ...currentDraft.shortcuts[name], modifier: cb.checked },
         },
       };
-    });
+    }, { signal });
   });
 
   document.getElementById('saveSettings')?.addEventListener('click', () => {
@@ -199,11 +204,11 @@ function setupModalButtons(): void {
     saveSettings(draft);
     _onSave?.();
     closeModal();
-  });
+  }, { signal });
 
   document.getElementById('exportSettings')?.addEventListener('click', () => {
     if (currentDraft) exportSettings(currentDraft);
-  });
+  }, { signal });
 
   document.getElementById('importSettingsFile')?.addEventListener('change', (e) => {
     const file = (e.target as HTMLInputElement).files?.[0];
@@ -222,7 +227,7 @@ function setupModalButtons(): void {
       },
     );
     (e.target as HTMLInputElement).value = '';
-  });
+  }, { signal });
 
   document.getElementById('resetSettings')?.addEventListener('click', () => {
     currentDraft = DEFAULT_SETTINGS;
@@ -230,5 +235,5 @@ function setupModalButtons(): void {
     saveSettings(DEFAULT_SETTINGS);
     _onSave?.();
     // モーダルは閉じない
-  });
+  }, { signal });
 }
