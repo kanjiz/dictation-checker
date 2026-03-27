@@ -34,8 +34,8 @@ export function downloadText(text: string, filename: string): void {
   URL.revokeObjectURL(url);
 }
 
-/** モジュールスコープで非表示タイマーを保持（連打時のリセットに使用） */
-let hideTimer: ReturnType<typeof setTimeout> | null = null;
+/** ダウンロードステータス表示を非表示にするタイマーID。連打時に clearTimeout でリセットするためモジュールスコープに保持。 */
+let statusHideTimer: ReturnType<typeof setTimeout> | null = null;
 
 /**
  * キーダウンイベントをショートカット設定に従って処理し、テキストをダウンロードする。
@@ -71,10 +71,10 @@ export function handleDownloadKeydown(
   downloadStatus.removeAttribute('hidden');
   downloadStatus.textContent = '保存しました';
 
-  if (hideTimer !== null) clearTimeout(hideTimer);
-  hideTimer = setTimeout(() => {
+  if (statusHideTimer !== null) clearTimeout(statusHideTimer);
+  statusHideTimer = setTimeout(() => {
     downloadStatus.setAttribute('hidden', '');
     downloadStatus.textContent = '';
-    hideTimer = null;
+    statusHideTimer = null;
   }, 2000);
 }

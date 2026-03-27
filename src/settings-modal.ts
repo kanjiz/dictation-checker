@@ -3,7 +3,8 @@ import type { ShortcutConfig, Settings } from './settings.ts';
 import { DEFAULT_SETTINGS } from './settings.ts';
 import { loadSettings, saveSettings, exportSettings, importSettings } from './settings-storage.ts';
 
-const TIME_WINDOW = 1500;
+/** 設定画面を開くコマンド入力の受付時間（ms）。この時間を超えると入力カウントをリセットする。 */
+const OPEN_COMMAND_TIMEOUT_MS = 1500;
 const SHORTCUT_KEYS = ['playPause', 'seekBack', 'seekForward', 'download'] as const;
 
 const keyDisplayMap: Record<string, string> = { ArrowLeft: '←', ArrowRight: '→' };
@@ -82,7 +83,7 @@ function handleEscKey(event: KeyboardEvent): void {
     return;
   }
   const now = Date.now();
-  if (now - lastEscTime > TIME_WINDOW) {
+  if (now - lastEscTime > OPEN_COMMAND_TIMEOUT_MS) {
     escCount = 1;
   } else {
     escCount++;
