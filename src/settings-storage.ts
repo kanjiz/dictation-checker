@@ -5,6 +5,12 @@ import { DEFAULT_SETTINGS } from './settings.ts';
 const STORAGE_KEY = 'settings';
 const CURRENT_VERSION = 1;
 
+/**
+ * localStorage から設定を読み込む。
+ * キーが存在しない・JSON が壊れている場合は `DEFAULT_SETTINGS` を返す。
+ *
+ * @returns 保存済み設定、またはフォールバックとして `DEFAULT_SETTINGS`
+ */
 export function loadSettings(): Settings {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -16,11 +22,22 @@ export function loadSettings(): Settings {
   }
 }
 
+/**
+ * 設定を localStorage に保存する。
+ *
+ * @param settings - 保存する設定
+ */
 export function saveSettings(settings: Settings): void {
   const data = { version: CURRENT_VERSION, shortcuts: settings.shortcuts, seek: settings.seek };
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
 }
 
+/**
+ * 設定を `settings.json` としてダウンロードする。
+ * ファイル名は常に `settings.json` 固定。
+ *
+ * @param settings - エクスポートする設定
+ */
 export function exportSettings(settings: Settings): void {
   const data = { version: CURRENT_VERSION, shortcuts: settings.shortcuts, seek: settings.seek };
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -34,6 +51,15 @@ export function exportSettings(settings: Settings): void {
   URL.revokeObjectURL(url);
 }
 
+/**
+ * `settings.json` ファイルを読み込み、バリデーションを通過した場合は
+ * localStorage に保存して `onSuccess` を呼び出す。
+ * バリデーションに失敗した場合は `onError` を呼び出し、localStorage は変更しない。
+ *
+ * @param file      - 読み込む JSON ファイル
+ * @param onSuccess - バリデーション通過時に呼ばれるコールバック。引数は読み込んだ設定
+ * @param onError   - バリデーション失敗時に呼ばれるコールバック。引数はエラーメッセージ
+ */
 export function importSettings(
   file: File,
   onSuccess: (settings: Settings) => void,

@@ -19,8 +19,16 @@ let escKeydownHandler: ((e: KeyboardEvent) => void) | null = null;
 let _onSave: (() => void) | null = null;
 let buttonAbortController: AbortController | null = null;
 
+/** 設定モーダルが現在開いているかを返す。 */
 export function isModalOpen(): boolean { return _isModalOpen; }
 
+/**
+ * 設定モーダルを初期化する。
+ * Esc × 3 検出リスナーとボタンイベントを登録する。
+ * 再呼び出し時は前回のリスナーをすべてクリーンアップしてから再登録する。
+ *
+ * @param onSave - 「保存」「読み込み」「リセット」実行後に呼ばれるコールバック
+ */
 export function initSettingsModal(onSave: () => void): void {
   // 前回のリスナーをクリーンアップ
   if (escKeydownHandler) {
