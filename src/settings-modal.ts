@@ -6,9 +6,14 @@ import { loadSettings, saveSettings, exportSettings, importSettings } from './se
 /** 設定画面を開くコマンド入力の受付時間（ms）。この時間を超えると入力カウントをリセットする。 */
 const OPEN_COMMAND_TIMEOUT_MS = 1500;
 const SHORTCUT_KEYS = ['playPause', 'seekBack', 'seekForward', 'download'] as const;
+/** 修飾キーと組み合わせるとブラウザに横取りされるため設定できないキー */
+const BROWSER_RESERVED_KEYS = ['q', 'w', 't', 'n', 'Tab'] as const;
 
 const keyDisplayMap: Record<string, string> = { ArrowLeft: '←', ArrowRight: '→' };
 function displayKey(key: string): string { return keyDisplayMap[key] ?? key; }
+function isBrowserReserved(key: string, modifier: boolean): boolean {
+  return modifier && (BROWSER_RESERVED_KEYS as readonly string[]).includes(key);
+}
 
 let _isModalOpen = false;
 let escCount = 0;
@@ -103,8 +108,8 @@ function populateModal(settings: Settings): void {
     const cb = document.querySelector<HTMLInputElement>(`[data-modifier="${name}"]`);
     if (cb) cb.checked = settings.shortcuts[name].modifier;
 
-    const errEl = document.querySelector<HTMLElement>(`[data-capture-error="${name}"]`);
-    if (errEl) { errEl.hidden = true; errEl.textContent = ''; }
+    const errorElement = document.querySelector<HTMLElement>(`[data-capture-error="${name}"]`);
+    if (errorElement) { errorElement.hidden = true; errorElement.textContent = ''; }
   });
 
   const backInput = document.getElementById('seekBackSeconds') as HTMLInputElement | null;
@@ -142,6 +147,15 @@ function startCapture(name: keyof ShortcutConfig): void {
       return;
     }
 
+    const errorElement = document.querySelector<HTMLElement>(`[data-capture-error="${name}"]`);
+
+    // ブラウザ予約済みキーチェック
+    if (isBrowserReserved(event.key, currentDraft!.shortcuts[name].modifier)) {
+      if (errorElement) { errorElement.hidden = false; errorElement.textContent = 'ブラウザが予約しているキーは使用できません'; }
+      if (btn) btn.textContent = displayKey(currentDraft!.shortcuts[name].key);
+      return;
+    }
+
     // 重複チェック
     const newKey = event.key;
     const newModifier = currentDraft!.shortcuts[name].modifier;
@@ -150,15 +164,13 @@ function startCapture(name: keyof ShortcutConfig): void {
         currentDraft!.shortcuts[k as keyof ShortcutConfig].key === newKey &&
         currentDraft!.shortcuts[k as keyof ShortcutConfig].modifier === newModifier,
     );
-
-    const errEl = document.querySelector<HTMLElement>(`[data-capture-error="${name}"]`);
     if (isDuplicate) {
-      if (errEl) { errEl.hidden = false; errEl.textContent = '他のショートカットと重複しています'; }
+      if (errorElement) { errorElement.hidden = false; errorElement.textContent = '他のショートカットと重複しています'; }
       if (btn) btn.textContent = displayKey(currentDraft!.shortcuts[name].key);
       return;
     }
 
-    if (errEl) { errEl.hidden = true; errEl.textContent = ''; }
+    if (errorElement) { errorElement.hidden = true; errorElement.textContent = ''; }
     currentDraft = {
       ...currentDraft!,
       shortcuts: {
@@ -192,11 +204,21 @@ function setupModalButtons(signal: AbortSignal): void {
     cb.addEventListener('change', () => {
       if (!currentDraft) return;
       const name = cb.dataset['modifier'] as keyof ShortcutConfig;
+      const newModifier = cb.checked;
+      const currentKey = currentDraft.shortcuts[name].key;
+      const errorElement = document.querySelector<HTMLElement>(`[data-capture-error="${name}"]`);
+
+      if (isBrowserReserved(currentKey, newModifier)) {
+        cb.checked = !newModifier;
+        if (errorElement) { errorElement.hidden = false; errorElement.textContent = 'ブラウザが予約しているキーは使用できません'; }
+        return;
+      }
+      if (errorElement) { errorElement.hidden = true; errorElement.textContent = ''; }
       currentDraft = {
         ...currentDraft,
         shortcuts: {
           ...currentDraft.shortcuts,
-          [name]: { ...currentDraft.shortcuts[name], modifier: cb.checked },
+          [name]: { ...currentDraft.shortcuts[name], modifier: newModifier },
         },
       };
     }, { signal });
@@ -216,7 +238,12 @@ function setupModalButtons(signal: AbortSignal): void {
   }, { signal });
 
   document.getElementById('exportSettings')?.addEventListener('click', () => {
-    if (currentDraft) exportSettings(currentDraft);
+    if (!currentDraft) return;
+    const backInput = document.getElementById('seekBackSeconds') as HTMLInputElement | null;
+    const fwdInput = document.getElementById('seekForwardSeconds') as HTMLInputElement | null;
+    const backSec = backInput ? Number(backInput.value) : currentDraft.seek.backSeconds;
+    const fwdSec  = fwdInput  ? Number(fwdInput.value)  : currentDraft.seek.forwardSeconds;
+    exportSettings({ ...currentDraft, seek: { backSeconds: backSec, forwardSeconds: fwdSec } });
   }, { signal });
 
   document.getElementById('importSettingsFile')?.addEventListener('change', (e) => {
