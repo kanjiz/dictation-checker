@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { handlePlayerKeydown } from './player.ts';
-import { DEFAULT_SHORTCUTS } from './shortcuts.ts';
+import { DEFAULT_SETTINGS } from './settings.ts';
 
 /**
  * currentTime を制御可能にするためのヘルパー。
@@ -36,7 +36,7 @@ describe('handlePlayerKeydown', () => {
       cancelable: true,
     });
     // mac = false を渡して OS によらず ctrlKey パスで判定する
-    handlePlayerKeydown(event, player, DEFAULT_SHORTCUTS, announce, false);
+    handlePlayerKeydown(event, player, DEFAULT_SETTINGS, announce, false);
     return event;
   };
 
@@ -105,6 +105,27 @@ describe('handlePlayerKeydown', () => {
       expect(player.play).not.toHaveBeenCalled();
       expect(player.pause).not.toHaveBeenCalled();
       expect(announce).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('カスタム seek 秒数', () => {
+    it('backSeconds: 5 のとき 5秒戻る', () => {
+      const settings = { ...DEFAULT_SETTINGS, seek: { backSeconds: 5, forwardSeconds: 10 } };
+      const ct = mockCurrentTime(player, 30);
+      const event = new KeyboardEvent('keydown', { key: 'ArrowLeft', ctrlKey: true, cancelable: true });
+      handlePlayerKeydown(event, player, settings, announce, false);
+      expect(ct.get()).toBe(25);
+      expect(announce).toHaveBeenCalledWith('5秒戻る');
+    });
+
+    it('forwardSeconds: 30 のとき 30秒進む', () => {
+      const settings = { ...DEFAULT_SETTINGS, seek: { backSeconds: 10, forwardSeconds: 30 } };
+      Object.defineProperty(player, 'duration', { value: 120, configurable: true });
+      const ct = mockCurrentTime(player, 50);
+      const event = new KeyboardEvent('keydown', { key: 'ArrowRight', ctrlKey: true, cancelable: true });
+      handlePlayerKeydown(event, player, settings, announce, false);
+      expect(ct.get()).toBe(80);
+      expect(announce).toHaveBeenCalledWith('30秒進む');
     });
   });
 });

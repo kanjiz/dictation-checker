@@ -1,7 +1,12 @@
-import type { ShortcutConfig } from './shortcuts.ts';
+import type { ShortcutConfig } from './settings.ts';
 import { isMac, matches } from './keyboard.ts';
 
-/** ローカル時刻で dictation-YYYYMMDD-HHMMSS.txt 形式のファイル名を生成する */
+/**
+ * ローカル時刻で dictation-YYYYMMDD-HHMMSS.txt 形式のファイル名を生成する。
+ *
+ * @param date - ファイル名に埋め込む日時
+ * @returns `dictation-YYYYMMDD-HHMMSS.txt` 形式の文字列
+ */
 export function generateFilename(date: Date): string {
   const pad = (n: number) => String(n).padStart(2, '0');
   const year  = date.getFullYear();
@@ -13,7 +18,12 @@ export function generateFilename(date: Date): string {
   return `dictation-${year}${month}${day}-${hours}${mins}${secs}.txt`;
 }
 
-/** テキストをブラウザのダウンロード機能でファイルとして保存する */
+/**
+ * テキストをブラウザのダウンロード機能でファイルとして保存する。
+ *
+ * @param text     - ダウンロードするテキスト内容
+ * @param filename - 保存時のファイル名
+ */
 export function downloadText(text: string, filename: string): void {
   const blob = new Blob([text], { type: 'text/plain; charset=utf-8' });
   const url = URL.createObjectURL(blob);
@@ -24,8 +34,8 @@ export function downloadText(text: string, filename: string): void {
   URL.revokeObjectURL(url);
 }
 
-/** モジュールスコープで非表示タイマーを保持（連打時のリセットに使用） */
-let hideTimer: ReturnType<typeof setTimeout> | null = null;
+/** ダウンロードステータス表示を非表示にするタイマーID。連打時に clearTimeout でリセットするためモジュールスコープに保持。 */
+let statusHideTimer: ReturnType<typeof setTimeout> | null = null;
 
 /**
  * キーダウンイベントをショートカット設定に従って処理し、テキストをダウンロードする。
@@ -61,10 +71,10 @@ export function handleDownloadKeydown(
   downloadStatus.removeAttribute('hidden');
   downloadStatus.textContent = '保存しました';
 
-  if (hideTimer !== null) clearTimeout(hideTimer);
-  hideTimer = setTimeout(() => {
+  if (statusHideTimer !== null) clearTimeout(statusHideTimer);
+  statusHideTimer = setTimeout(() => {
     downloadStatus.setAttribute('hidden', '');
     downloadStatus.textContent = '';
-    hideTimer = null;
+    statusHideTimer = null;
   }, 2000);
 }
