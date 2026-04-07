@@ -227,7 +227,7 @@ matches(new KeyboardEvent('keydown', { key: 'Enter', metaKey: true }), shortcut,
 ## 変更対象ファイル一覧
 
 | ファイル | 変更種別 |
-|---|---|
+| --- | --- |
 | `src/shortcuts.ts` | 改修（`ctrl` → `modifier`） |
 | `src/keyboard.ts` | 新規作成 |
 | `src/keyboard.test.ts` | 新規作成 |
