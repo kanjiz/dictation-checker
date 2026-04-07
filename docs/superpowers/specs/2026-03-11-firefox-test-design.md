@@ -29,6 +29,7 @@ ci.yml と同様の変更を適用する。
 - L12 のブラウザ注記を更新：
   > Google Chrome 推奨（Chromium ベースのブラウザおよび Firefox で動作）
 - 開発者向けセットアップのインストールコマンドを更新：
+
   ```bash
   npx playwright install chromium firefox  # テスト用ブラウザをインストール
   ```
